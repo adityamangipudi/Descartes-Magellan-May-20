@@ -5,29 +5,101 @@
     <title></title>
     <script>
 
+        function parseFunctionString(fn_string) {
+            var arr = fn_string.match(/^([^(]+)\(([^)]+)/);
+
+            var params = [];
+            if (arr[2]) {
+                params = arr[2].split(',').map(function (param) {
+                    return param.trim();
+                });
+            }
+
+            return {
+                name: arr[1],
+                params: params
+            }
+        }
+
         var injector = {
             dependencies: { // todo: convert injector to a function so that this can be a private variable
 
             },
             register: function (name, obj) {
                 // registers it in the list of dependencies
+                if (typeof obj === 'function') {
+                    console.log(/^[A-Z]/.test(obj.name));
+                    if (/^[A-Z]/.test(obj.name)) {
+                        this.dependencies[name] = new obj();
+                    } else {
+                        this.dependencies[name] = obj();
+                    }
+                } else {
+                    this.dependencies[name] = obj;
+                }
+
             },
             invoke: function (fn) {
+                var self = this;
+                var _args = arguments;
                 // arguments
+
+                var param_names = parseFunctionString(fn.toString()).params;
+
+                console.log(param_names);
+                var args = [];
+                var counter = 1; // arguments - [test, 1, 2]
+                param_names.forEach(function (param) {
+
+                    if (param in self.dependencies) {
+                        args.push(self.dependencies[param]);
+                        console.log(self.dependencies[param]);
+                    } else {
+                        args.push(_args[counter++]);
+                    }
+                });
+
+                console.log(args);
+                fn.apply(null, args);
             }
         };
 
-        injector.register('car', {
+        injector.register('car', { // as object
             make: 'BMW'
         });
+
+        injector.register('certificate', function () { // factory
+            var cert = 'asdf-asd1fas1df31sad3fasd';
+            return {
+                get data() {
+                    return cert;
+                }
+            }
+        });
+
+        function Certifcate() {
+            var cert = 'asdf-asd1fas1df31sad3fasd';
+            Object.defineProperty(this, 'data', {
+                get: function () {
+                    return cert;
+                }
+            });
+        }
+
+        injector.register('certificatex', Certifcate); // constructor
 
         injector.register('person', {
             name: 'Rashmika'
         });
 
-        function test(car, lic, vin, person) {
+        console.log(injector);
+
+
+
+        function test(car, lic, vin, person) { // ['car', 'lic', 'vin', 'person']
+            console.log(arguments);
             // car and person are dependencies
-            console.log(person.name, ' - order form for - ', car.name, ' lic: ', lic, ' vin: ', vin);
+            console.log(person.name, ' - order form for - ', car.make, ' lic: ', lic, ' vin: ', vin);
         }
 
         injector.invoke(test, '54353a5dsf', '53453-135dfs131'); // print out all the data
