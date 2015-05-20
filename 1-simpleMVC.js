@@ -16,13 +16,27 @@
     // sets it as a view on the model, using model.register
 
 
-function Controller(name, model) {
+function Controller(name, model, fn) {
+
+    var scope = new fn();
+
     // get the view - function
     var view = document.querySelector('[data-controller="' + name + '"]');
     console.log(view); // todo: replace this with test code
     // register view on model
     model.register(view);
     console.log(model.views); // todo: replace this with test code
+
+    // resolve event listeners
+    // search for data-<events>
+    // parse the function name and parameters
+    // register an event listener on the elements
+
+
+
+    registerEvents(this, view); // convert to a prototype method
+
+
 }
 
 function Model(data) {
@@ -52,6 +66,49 @@ Model.prototype.set = function (key, value) {
     // call update
     this.update(key, value);
 };
+
+
+// utilities
+
+function registerEvents(controller, view_element) {
+    // search for markers - currently only looking for data-change
+    // change this to work with any number of supporetd events
+    var elements = Array.prototype.slice.call(view_element.querySelectorAll('[data-change]'));
+
+    // map each element to the function
+    var functions = elements.map(function (element) {
+
+        // extract the function name and function parameters
+        var fnname, fnparams; // fnname = setName
+
+        // register the event listnener
+
+        element.addEventListener('change', function (e) {
+            controller[fnname].apply(controller, fnparams);
+        });
+
+        return element.getAttribute('data-change');
+    });
+
+    console.log(functions); // todo: replace this with test code
+
+}
+
+function parseFunctionString(fn_string) {
+    var arr = fn_string.match(/^([^(]+)\(([^)]+)/);
+
+    var params = [];
+    if (arr[2]) {
+        params = arr[2].split(',').map(function (param) {
+            return param.trim();
+        });
+    }
+
+    return {
+        name: arr[1],
+        params: params
+    }
+}
 
 
 

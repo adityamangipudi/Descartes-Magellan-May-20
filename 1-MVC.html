@@ -3,6 +3,7 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
+    <link rel="stylesheet" href="base.css"/>
     <script src="1-simpleMVC.js"></script>
     <script>
 
@@ -13,7 +14,14 @@
             });
 
             // create a controller for Github
-            var controller = new Controller('GithubController', model);
+            var controller = new Controller('GithubController', model, function () {
+                // constructor function
+
+                this.setName = function () {
+                    model.set();
+                };
+
+            });
 
             // change the model
             model.set('owner', 'Aditya');
@@ -23,13 +31,9 @@
 </head>
 <body>
     <div data-controller="GithubController">
-
-
-        The owner of the repository : <span data-bind="owner"></span>
-        The owner of the repository : <span data-bind="owner"></span>
-        The owner of the repository : <span data-bind="owner"></span>
         The owner of the repository : <span data-bind="owner"></span>
 
+        <input type="text" placeholder="enter owner name" data-change="setName(name)"/>
 
     </div>
 </body>

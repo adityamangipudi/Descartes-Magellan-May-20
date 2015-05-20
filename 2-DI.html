@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script>
+
+        var injector = {
+            dependencies: { // todo: convert injector to a function so that this can be a private variable
+
+            },
+            register: function (name, obj) {
+                // registers it in the list of dependencies
+            },
+            invoke: function (fn) {
+                // arguments
+            }
+        };
+
+        injector.register('car', {
+            make: 'BMW'
+        });
+
+        injector.register('person', {
+            name: 'Rashmika'
+        });
+
+        function test(car, lic, vin, person) {
+            // car and person are dependencies
+            console.log(person.name, ' - order form for - ', car.name, ' lic: ', lic, ' vin: ', vin);
+        }
+
+        injector.invoke(test, '54353a5dsf', '53453-135dfs131'); // print out all the data
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
